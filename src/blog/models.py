@@ -12,3 +12,7 @@ class BlogPost(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     embedding = VectorField(dimensions=EMEDDING_LENGTH, blank=True, null=True)
+    can_delete = models.BooleanField(default=False, help_text="Use in jupyter notebooks")
+
+    def get_embedding_text_raw(self):
+        return self.content
