@@ -5,3 +5,5 @@ openai
 pgvector
 # psycopg2[binary]
 psycopg[binary]
+python-decouple
+dj-database-url
