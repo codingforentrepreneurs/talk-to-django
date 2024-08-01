@@ -1,4 +1,4 @@
-from decouple import config
+
 
 from sqlalchemy import make_url
 
@@ -6,22 +6,16 @@ from llama_index.vector_stores.postgres import PGVectorStore
 from llama_index.core import VectorStoreIndex, StorageContext
 from llama_index.core.query_engine import RetrieverQueryEngine
 
-from . import settings
+from . import db, settings
 
 EMEDDING_LENGTH = settings.EMEDDING_LENGTH
 
 settings.init()
 
-def get_database_url():
-    db_url_env = config("DATABASE_URL_POOL")
-    if db_url_env.startswith("postgres://"):
-        return db_url_env.replace("postgres://", "postgresql://", 1)
-    return db_url_env
-
 def get_vector_store(
         vector_db_name="vector_db", vector_db_table_name="blogpost"
     ):
-    db_url = get_database_url()
+    db_url = db.get_database_url(use_pooling=True)
     url = make_url(db_url)
     return PGVectorStore.from_params(
         database=vector_db_name,
