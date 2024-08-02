@@ -5,7 +5,7 @@ from llama_index.core import Settings
 
 from .embeddings import MyOpenAIEmbedding
 
-LLM_MODEL = config("LLM_MODEL", default="gpt-4o") # not in use use
+LLM_MODEL = config("LLM_MODEL", default="gpt-4o")
 EMEDDING_LENGTH = config("EMEDDING_LENGTH", default=1536, cast=int)
 EMEDDING_MODEL =config("EMEDDING_MODEL", default="text-embedding-3-small")
 OPENAI_API_KEY = config("OPENAI_API_KEY")
