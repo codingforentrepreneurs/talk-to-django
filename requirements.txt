@@ -7,3 +7,9 @@ pgvector
 psycopg[binary]
 python-decouple
 dj-database-url
+dateparser
+numpy
+sqlalchemy 
+llama-index
+llama-index-llms-openai
+llama-index-vector-stores-postgres

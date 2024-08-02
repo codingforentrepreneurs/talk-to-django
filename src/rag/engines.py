@@ -1,7 +1,6 @@
 from typing import List
 from django.apps import apps
 from sqlalchemy import make_url, create_engine
-
 from llama_index.vector_stores.postgres import PGVectorStore
 from llama_index.core import VectorStoreIndex, StorageContext
 from llama_index.core.query_engine import RetrieverQueryEngine
@@ -9,14 +8,14 @@ from llama_index.core import SQLDatabase
 from llama_index.core.query_engine import NLSQLTableQueryEngine
 from llama_index.core.retrievers import NLSQLRetriever
 
-from . import db, settings
+from . import db, settings, prompts
 
 EMEDDING_LENGTH = settings.EMEDDING_LENGTH
 
 settings.init()
 
 def get_vector_store(
-        vector_db_name="vector_db", vector_db_table_name="blogpost"
+        vector_db_name=settings.VECTOR_DB_NAME, vector_db_table_name=settings.VECTOR_DB_TABLE_NAME
     ):
     db_url = db.get_database_url(use_pooling=True)
     url = make_url(db_url)
@@ -58,6 +57,7 @@ def get_default_sql_engine_tables() -> List[str]:
         tables.append(table)
     return tables
 
+
 def get_llamaindex_sql_database() -> SQLDatabase:
     """
     Using django database 
@@ -72,20 +72,23 @@ def get_llamaindex_sql_database() -> SQLDatabase:
 def get_sql_query_engine(*args, **kwargs) -> NLSQLTableQueryEngine:
     tables = get_default_sql_engine_tables()
     sql_database = get_llamaindex_sql_database()
-    return NLSQLTableQueryEngine(
-        sql_database=sql_database,
-        tables=tables,
-        *args, 
-        **kwargs
-    )
+    config = {
+        "sql_database": sql_database,
+        "tables": tables,
+        "response_synthesis_prompt": prompts.custom_sql_response_synthesis_prompt,
+        "text_to_sql_prompt": prompts.custom_text_to_sql_prompt
+    }
+    config.update(**kwargs)
+    return NLSQLTableQueryEngine(*args, **config)
 
 def get_sql_query_retriever(*args, **kwargs) -> NLSQLRetriever:
     tables = get_default_sql_engine_tables()
     sql_database = get_llamaindex_sql_database()
-    return NLSQLRetriever(
-        sql_database, 
-        tables=tables, 
-        return_raw=True,
-        *args, 
-        **kwargs
-    )
+    config = {
+        "sql_database": sql_database,
+        "tables": tables,
+        "response_synthesis_prompt": prompts.custom_sql_response_synthesis_prompt,
+        "text_to_sql_prompt": prompts.custom_text_to_sql_prompt
+    }
+    config.update(**kwargs)
+    return NLSQLRetriever(*args, **config)
